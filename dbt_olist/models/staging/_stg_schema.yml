@@ -1,0 +1,120 @@
+version 2:
+
+models:
+  - name: stg_customers
+    description: "Staging model for customers data"
+    columns:
+      - name: customer_id
+        description: "Unique identifier for each customer"
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_geolocation
+    description: "Staging model for geolocation data"
+    columns:
+      - name: geolocation_zip_code_prefix
+        description: "Zip code prefix for geolocation data"
+        tests:
+          - not_null
+
+  - name: stg_order_items
+    description: "Staging model for order items data"
+    columns:
+      - name: order_id
+        description: "Unique identifier for each order"
+        tests:
+          - not_null
+      - name: order_item_id
+        description: "Unique identifier for each item in an order"
+        tests:
+          - unique
+          - not_null
+      - name: product_id
+        description: "Unique identifier for each product"
+        tests:
+          - not_null
+      - name: seller_id
+        description: "Unique identifier for each seller"
+        tests:
+          - not_null 
+    
+  - name: stg_order_payments
+    description: "Staging model for order payments data"
+    columns:
+      - name: order_id
+        description: "Unique identifier for each order"
+        tests:
+          - not_null
+      - name: payment_sequential
+        description: "Sequential number of the payment for an order"
+        tests:
+          - not_null
+      - name: payment_type
+        description: "Type of payment used for the order"
+        tests:
+          - not_null
+      - name: payment_installments
+        description: "Number of installments for the payment"
+        tests:
+          - not_null
+      - name: payment_value
+        description: "Value of the payment"
+        tests:
+          - not_null
+
+  - name: stg_order_reviews
+    description: "Staging model for order reviews data"
+    columns:
+      - name: review_id
+        description: "Unique identifier for each review"
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_orders
+    description: "Staging model for orders data"
+    columns:
+      - name: order_id
+        description: "Unique identifier for each order"
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: "Unique identifier for each customer"
+        tests:
+          - not_null
+      - name: order_status
+        description: "Status of the order"
+        tests:
+          - not_null
+
+  - name: stg_product_category_name_translation
+    description: "Staging model for products category name translation data"
+    columns:
+      - name: product_category_name
+        description: "Name of the product category"
+        tests:
+          - not_null
+      - name: product_category_name_english
+        description: "English name of the product category"
+        tests:
+          - not_null
+        
+  - name: stg_products
+    description: "Staging model for products data"
+    columns:
+      - name: product_id
+        description: "Unique identifier for each product"
+        tests:
+          - unique
+          - not_null
+  
+  - name: stg_sellers
+    description: "Staging model for sellers data"
+    columns:
+      - name: seller_id
+        description: "Unique identifier for each seller"
+        tests:
+          - unique
+          - not_null

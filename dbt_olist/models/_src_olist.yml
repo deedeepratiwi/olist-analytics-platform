@@ -1,0 +1,14 @@
+version: 2
+
+sources:
+  - name: olist_raw
+    tables:
+      - name: load_customers
+      - name: load_geolocation
+      - name: load_order_items
+      - name: load_order_payments
+      - name: load_order_reviews
+      - name: load_orders
+      - name: load_product_category_name_translation
+      - name: load_products
+      - name: load_sellers
