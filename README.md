@@ -88,7 +88,7 @@ The data is modeled using a **dimensional modeling** approach with a star schema
     - product category
 
 
-![Olist DBT](images/olist-dbt.png)
+![Olist DBT](images/olist_dbt.png)
 
 ---
 
@@ -147,7 +147,7 @@ Powered by `fact_order_items` and `dim_products`, answering: which categories dr
 
 ## 📸 Dashboard Preview
 
-![Olist Dashboard](images/olist-dashboard.png)
+![Olist Dashboard](images/olist_dashboard.png)
 
 ---
 
