@@ -11,9 +11,14 @@ wheels/
 .venv
 .env
 
+# terraform
+.terraform/
+
 # data
 data/
 *.json
+*.csv
+*.parquet
 
 # Secrets
 .gcp/
