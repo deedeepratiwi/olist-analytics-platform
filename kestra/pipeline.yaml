@@ -1,0 +1,55 @@
+id: olist_pipeline
+namespace: dev
+
+tasks:
+  - id: run_dlt
+    type: io.kestra.plugin.docker.Run
+    containerImage: elt-ecommerce-app
+    volumeMounts:
+      - name: kaggle
+        mountPath: /kaggle
+        hostPath: /home/diana/elt-ecommerce/.kaggle
+      - name: gcp
+        mountPath: /secrets
+        hostPath: /home/diana/elt-ecommerce/.gcp
+    env:
+      GOOGLE_APPLICATION_CREDENTIALS: /secrets/elt-ecommerce-tf.json
+      KAGGLE_CONFIG_DIR: /kaggle
+    commands:
+      - sh
+      - -c 
+      - |
+        cd /app
+        python dlt-pipeline/dlt_pipeline.py
+
+  - id: run_dbt
+    type: io.kestra.plugin.docker.Run
+    containerImage: elt-ecommerce-app
+    volumeMounts:
+      - name: gcp
+        mountPath: /secrets
+        hostPath: /home/diana/elt-ecommerce/.gcp
+    env:
+      GOOGLE_APPLICATION_CREDENTIALS: /secrets/elt-ecommerce-tf.json
+    commands:
+      - sh
+      - -c 
+      - |
+        cd /app/dbt_olist
+        dbt run
+
+  - id: test_dbt
+    type: io.kestra.plugin.docker.Run
+    containerImage: elt-ecommerce-app
+    volumeMounts:
+      - name: gcp
+        mountPath: /secrets
+        hostPath: /home/diana/elt-ecommerce/.gcp
+    env:
+      GOOGLE_APPLICATION_CREDENTIALS: /secrets/elt-ecommerce-tf.json
+    commands:
+      - sh
+      - -c 
+      - |
+        cd /app/dbt_olist
+        dbt test

@@ -1,7 +1,7 @@
 # 📊 E-Commerce Behavioral Analytics Platform
 
 ## 🚀 Overview
-This project builds a **cloud-native analytics platform** to analyze customer and product behavior using the [Olist e-commerce dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce). The goal is to transform raw transactional data into **analytics-ready datasets** that support business insights such as customer retention, purchase behavior, and product performance.
+This project builds an end-to-end ELT (Extract, Load, Transform) **cloud-native analytics platform** to analyze customer and product behavior using the [Olist e-commerce dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce). The goal is to transform raw transactional data into **analytics-ready datasets** that support business insights such as customer retention, purchase behavior, and product performance.
 
 The platform follows a modern data stack approach, combining data ingestion, distributed processing, transformation, and orchestration to deliver reliable and scalable analytics.
 
@@ -20,22 +20,9 @@ By building an end-to-end pipeline, this project demonstrates how raw data can b
 ---
 
 ## 🧱 Architecture
+Kaggle Dataset (via Kaggle API) --> dlt ingestion --> BigQuery Raw --> dbt transformations --> BigQuery Mart --> Looker Studio Dashboard
 
-Kaggle Dataset (CSV)
-    ↓
-dlt ingestion
-    ↓
-GCS / BigQuery Raw
-    ↓
-PySpark processing
-    ↓
-BigQuery Staging
-    ↓
-dbt transformations
-    ↓
-Analytics Data Mart
-    ↓
-Looker Studio Dashboard
+![Olist Pipeline](images/olist_pipeline.png)
 
 ---
 
@@ -43,20 +30,18 @@ Looker Studio Dashboard
 | Layer              | Tools            |
 | ------------------ | ---------------- |
 | Ingestion          | Kaggle API + dlt |
-| Processing         | PySpark          |
 | Transformation     | dbt              |
 | Orchestration      | Kestra           |
 | Data Warehouse     | BigQuery         |
 | Infrastructure     | Terraform        |
 | Containerization   | Docker           |
-| Optional Streaming | Kafka, PyFlink   |
 | Visualization      | Looker Studio    |
 | Environment        | GCP VM + uv      |
 
 ---
 
 ## 📦 Dataset
-- Source:[Olist E-Commerce Dataset (Brazilian marketplace)](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce)
+- Source: [Olist E-Commerce Dataset (Brazilian marketplace)](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce)
 - Tables include:
   - customers
   - geolocation
@@ -71,84 +56,43 @@ Looker Studio Dashboard
 ---
 
 ## 🧮 Data Modeling
-The project follows a **layered approach**:
+The data is modeled using a **dimensional modeling** approach with a star schema design.
 
-### 🔹 Staging Layer
-- Cleans and standardizes raw data
-- Casts data types (e.g., timestamps)
-
-### 🔹 Core Layer
+### 🔹 Fact tables
 - `fct_orders`
-  - Grain: one row per order
-  - Includes total order value, item count, timestamps
+- `fct_order_items`
+- `fct_payments`
 
-### 🔹 Data Marts
+### 🔹 Dimension tables
+- `dim_customers`
+- `dim_products`
+- `dim_sellers`
+- `dim_date`
 
-#### `mart_user_behavior`
-- Customer-level aggregation
-- Metrics:
-  - total_orders
-  - total_spent
-  - avg_order_value
-  - days_since_last_order
-  - repeat customer flag
+### 🔹 Marts tables
+-  `mart_user_behavior`
+  - Customer-level aggregation
+  - Metrics:
+    - total_orders
+    - total_spent
+    - avg_order_value
+    - days_since_last_order
+    - repeat customer flag
 
-#### `mart_product_performance`
-- Product-level aggregation
-- Metrics:
-  - total_orders
-  - total_revenue
-  - avg_price
-  - product category
+- `mart_product_performance`
+  - Product-level aggregation
+  - Metrics:
+    - total_orders
+    - total_revenue
+    - avg_price
+    - product category
 
----
 
-The platform uses a star schema design:
-
-Fact Tables
-fact_orders
-Dimension Tables
-dim_customers
-dim_products
-dim_sellers
-dim_dates
-Analytical Data Marts
-mart_user_behavior
-mart_product_performance
-mart_seller_performance
+![Olist DBT](images/olist-dbt.png)
 
 ---
 
-🔍 Key Business Questions
-1. Customer Behavior
-What is the repeat purchase rate?
-How does customer value evolve over time?
-2. Product Performance
-Which categories drive the most revenue?
-Which products have the highest repeat purchases?
-3. Seller Performance
-Which sellers generate the most revenue?
-How does delivery performance affect ratings?
-4. Purchase Patterns
-How frequently do users return?
-What categories are commonly purchased together?
-
----
-🚀 Pipeline Workflow
-Ingestion
-dlt loads raw data into GCS / BigQuery
-Processing
-PySpark cleans and aggregates large datasets
-Transformation
-dbt builds fact/dimension tables and marts
-Orchestration
-Kestra schedules and runs workflows
-Serving
-Data is exposed to BI dashboards
-
----
 ## ⚡ Data Warehouse Optimization
-
 - **Partitioning:**
   - `fact_orders` partitioned by `order_purchase_timestamp`
 - **Clustering:**
@@ -157,92 +101,120 @@ Data is exposed to BI dashboards
 This improves query performance and reduces cost.
 
 ---
-## 🔄 Pipeline
 
+## 🚀 Pipeline Workflow
+### Infrastructure
+- Terraform provisions GCP resources (BigQuery, GCS, VM)
 ### Ingestion
-- dlt loads raw CSV data into BigQuery (`olist_raw`)
-
+- Kaggle API download the dataset and dlt loads raw CSV data into BigQuery (`olist_raw`)
 ### Transformation
-- dbt builds staging models, fact table, and marts
+- dbt builds staging models, fact/dimension tables and marts
+### Orchestration
+- Kestra schedules and runs workflows
+### Serving
+- Data is exposed to Looker Studio dashboards
 
 ---
 
-🔄 Orchestration (Kestra)
-
+## 🔄 Orchestration (Kestra)
 The pipeline automates:
-
-Data ingestion
-Spark transformations
-dbt runs and tests
+- dlt ingestion
+- dbt runs 
+- dbt tests
 
 ---
 
 ## 📊 Dashboard
-The dashboard provides insights into:
+The dashboard is built on a **star schema** with fact and dimension tables and provides business insights accross revenue, customer, and product.
+### Business Overview
+- Total revenue
+- Total orders
+- Average order value
+- Revenue trend across time
+These metrics are powered by the `fact_orders` table and show overall business performance and growth.
 
 ### Customer Behavior
-- Repeat vs one-time customers
-- Customer spending patterns
+- Repeat customer rate
+- Customer segmentation (high/mid/low value)
+Built from `mart_user_behavior` and `dim_customers`, enabling: customer value segmentation and behavioral insights.
 
 ### Product Performance
 - Revenue by product category
-- Top-performing products
+- Top products by revenue
+Powered by `fact_order_items` and `dim_products`, answering: which categories drive revenue and which products perform best.
 
 ---
-The dashboard provides:
 
-Customer Insights
-retention cohorts
-repeat purchase rate
-Product Insights
-category revenue
-top products
-Seller Insights
-revenue by seller
-delivery performance
-
----
 ## 📸 Dashboard Preview
 
-_Add screenshot here_
+![Olist Dashboard](images/olist-dashboard.png)
 
 ---
 
+## 🔐 Required Setup
+This project requires **external credentials**.
+1. **Kaggle API Key**
+  - Go to your Kaggle account settings
+  - Click "Create New API Token"
+  - Move the file, e.g.:
+    ```bash
+    mkdir -p ~/.kaggle
+    mv ~/Downloads/kaggle.json ~/.kaggle/
+    chmod 600 ~/.kaggle/kaggle.json
+    ```
+
+2. **GCP Service Account Key**
+  - Create a Service Account in GCP
+  - Grant roles:
+    - BigQuery Data Editor
+    - BigQuery Job User
+  - Download the JSON key
+  - Place it somewhere safe, e.g.:
+    ```bash
+    mkdir -p ~/elt-ecommerce/.gcp
+    mv ~/Downloads/your-key.json ~/elt-ecommerce/.gcp/
+    ```
+
+3. **Set Environment Variable**
+  ```bash
+  export GOOGLE_APPLICATION_CREDENTIALS=~/elt-ecommerce/.gcp/your-key.json
+  ```
+
+---
 ## 🛠️ How to Run
-### 1. Setup environment
+### 1. Clone Repository
 ```bash
+git clone https://github.com/deedeepratiwi/olist-analytics-platform.git
+cd olist-analytics-platform
+```
+
+### 2. Install Dependencies
+```bash
+uv venv
 uv sync
 ```
 
-### 2. Setup GCP credentials
-```bash
-export GOOGLE_APPLICATION_CREDENTIALS="/path/to/credentials.json"
-```
-
-### 3. Run Ingestion
-```bash
-cd dlt-pipeline
-python dlt_pipeline.py
-```
-
-### 4. Run Transformations
-```bash
-cd dbt-olist
-dbt run
-dbt test
-```
-# Provision infrastructure
+### 3. Provision infrastructure
 cd terraform
 terraform init
 terraform apply
 
+### 4. Run Data Ingestion (dlt)
+```bash
+uv run python dlt-pipeline/dlt_pipeline.py
+```
 
-# Run transformations
-cd spark_jobs
-spark-submit clean_orders.py
+### 5. Run Transformations (dbt)
+```bash
+cd dbt-olist
+uv run dbt run
+uv run dbt test
+```
 
-# Start orchestration
-kestra server start
+### 6. (Optional) Run Tests (dbt)
+```bash
+uv run dbt test
+```
 
 ---
 
@@ -258,9 +230,5 @@ kestra server start
 ---
 
 ## 📈 Future Improvements
-- Add real-time dashboards using streaming pipelines
 - Implement data quality monitoring dashboards
 - Extend models for recommendation systems
-- Add workflow orchestration (Kestra)
-- Implement streaming pipeline (Kafka / Flink)
-- Add advanced customer segmentation (RFM / clustering)

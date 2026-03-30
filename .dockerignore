@@ -1,0 +1,26 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Data
+data/
+
+# Secrets
+.gcp/
+.dlt/
+*.json
+
+# dbt
+target/
+logs/
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Misc
+notes.txt

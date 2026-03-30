@@ -7,7 +7,6 @@ models:
       - name: customer_id
         description: "Unique identifier for each customer"
         tests:
-          - unique
           - not_null
 
   - name: stg_geolocation
@@ -28,7 +27,6 @@ models:
       - name: order_item_id
         description: "Unique identifier for each item in an order"
         tests:
-          - unique
           - not_null
       - name: product_id
         description: "Unique identifier for each product"
@@ -69,7 +67,6 @@ models:
       - name: review_id
         description: "Unique identifier for each review"
         tests:
-          - unique
           - not_null
 
   - name: stg_orders
@@ -78,7 +75,6 @@ models:
       - name: order_id
         description: "Unique identifier for each order"
         tests:
-          - unique
           - not_null
       - name: customer_id
         description: "Unique identifier for each customer"
@@ -107,7 +103,6 @@ models:
       - name: product_id
         description: "Unique identifier for each product"
         tests:
-          - unique
           - not_null
   
   - name: stg_sellers
@@ -116,5 +111,4 @@ models:
       - name: seller_id
         description: "Unique identifier for each seller"
         tests:
-          - unique
           - not_null

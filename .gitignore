@@ -5,15 +5,19 @@ build/
 dist/
 wheels/
 *.egg-info
+.python-version
 
 # Virtual environments
 .venv
 .env
 
 # data
+data/
 *.json
 
-# dlt
+# Secrets
+.gcp/
+.kaggle/
 .dlt/
 
 # dbt
@@ -21,3 +25,8 @@ target/
 logs/
 *.log
 
+# Notebooks
+.ipynb_checkpoints/
+
+# Misc
+notes.txt

@@ -13,12 +13,12 @@ provider "google" {
   region      = var.region
 }
 
-
+# GCS bucket
 resource "google_storage_bucket" "olist-bucket" {
   name          = var.gcs_bucket_name
   location      = var.location
+  storage_class = var.gcs_storage_class
   force_destroy = true
-
 
   lifecycle_rule {
     condition {
@@ -30,9 +30,14 @@ resource "google_storage_bucket" "olist-bucket" {
   }
 }
 
+# Raw dataset
+resource "google_bigquery_dataset" "olist_raw" {
+  dataset_id = var.bq_dataset_raw
+  location   = var.location
+}
 
-
-resource "google_bigquery_dataset" "olist_dataset" {
-  dataset_id = var.bq_dataset_name
+# Analytics dataset
+resource "google_bigquery_dataset" "olist_analytics" {
+  dataset_id = var.bq_dataset_analytics
   location   = var.location
 }

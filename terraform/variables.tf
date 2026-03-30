@@ -1,6 +1,6 @@
 variable "credentials" {
   description = "My Credentials"
-  default     = "~/elt-ecommerce/.gcp/elt-ecommerce-tf.json"
+  default     = "/home/diana/elt-ecommerce/.gcp/elt-ecommerce-tf.json"
 }
 
 variable "project" {
@@ -10,22 +10,27 @@ variable "project" {
 
 variable "region" {
   description = "Region"
-  default     = "asia-southeast1-c"
+  default     = "us-central1"
 }
 
 variable "location" {
   description = "Project Location"
-  default     = "ASIA"
+  default     = "US"
 }
 
-variable "bq_dataset_name" {
-  description = "My BigQuery Dataset Name"
-  default     = "olist_dataset"
+variable "bq_dataset_raw" {
+  description = "Raw Dataset"
+  default     = "olist_raw"
+}
+
+variable "bq_dataset_analytics" {
+  description = "Analytics Dataset"
+  default     = "olist_analytics"
 }
 
 variable "gcs_bucket_name" {
-  description = "My Storage Bucket Name"
-  default     = "olist-raw-bucket"
+  description = "Unique Bucket Name"
+  default     = "olist-raw-bucket-elt-ecommerce"
 }
 
 variable "gcs_storage_class" {
