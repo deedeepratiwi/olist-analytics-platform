@@ -1,0 +1,73 @@
+id: olist_pipeline
+namespace: dev
+
+tasks:
+  - id: run_dlt
+    type: io.kestra.plugin.docker.Run
+    containerImage: elt-ecommerce-app
+    env:
+      GCP_KEY: "{{secret('GCP_KEY')}}"
+      KAGGLE_KEY: "{{secret('KAGGLE_KEY')}}"
+    commands:
+      - sh
+      - -c
+      - |
+        # 1. CHECK: If secret() is empty, stop and error out
+        if [ -z "$KAGGLE_KEY" ]; then
+          echo "FATAL ERROR: Kestra secret('KAGGLE_KEY') returned an empty string."
+          exit 1
+        fi
+
+        # 2. Setup Kaggle credentials file
+        mkdir -p /root/.kaggle
+        printf '%s' "$KAGGLE_KEY" > /root/.kaggle/kaggle.json
+        chmod 600 /root/.kaggle/kaggle.json
+
+        # 3. Setup GCP credentials file
+        mkdir -p /secrets
+        printf '%s' "$GCP_KEY" > /secrets/elt-ecommerce-tf.json
+        export GOOGLE_APPLICATION_CREDENTIALS=/secrets/elt-ecommerce-tf.json
+
+        # 4. Debug: Print the size of the Kaggle JSON file to verify it's not empty
+        echo "Kaggle JSON size: $(wc -c < /root/.kaggle/kaggle.json) bytes"
+
+        # 5. Debug: Print the size of the GCP JSON file to verify it's not empty
+        echo "GCP JSON size: $(wc -c < /secrets/elt-ecommerce-tf.json) bytes"
+
+        # 6. Run the pipeline
+        cd /app
+        python dlt-pipeline/dlt_pipeline.py
+
+  - id: run_dbt
+    type: io.kestra.plugin.docker.Run
+    containerImage: elt-ecommerce-app
+    env:
+      GCP_KEY: "{{secret('GCP_KEY')}}"
+    commands:
+      - sh
+      - -c
+      - |
+        cd /app/dbt_olist
+
+        mkdir -p /secrets
+        printf '%s' "$GCP_KEY" > /secrets/elt-ecommerce-tf.json
+        export GOOGLE_APPLICATION_CREDENTIALS=/secrets/elt-ecommerce-tf.json
+
+        uv run dbt run --profiles-dir .
+
+  - id: test_dbt
+    type: io.kestra.plugin.docker.Run
+    containerImage: elt-ecommerce-app
+    env:
+      GCP_KEY: "{{secret('GCP_KEY')}}"
+    commands:
+      - sh
+      - -c
+      - |
+        cd /app/dbt_olist
+
+        mkdir -p /secrets
+        printf '%s' "$GCP_KEY" > /secrets/elt-ecommerce-tf.json
+        export GOOGLE_APPLICATION_CREDENTIALS=/secrets/elt-ecommerce-tf.json
+        
+        uv run dbt test

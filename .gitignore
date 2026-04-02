@@ -10,6 +10,7 @@ wheels/
 # Virtual environments
 .venv
 .env
+.env_encoded
 
 # terraform
 .terraform/
@@ -35,3 +36,6 @@ logs/
 
 # Misc
 notes.txt
+
+# ruff
+.ruff_cache/
