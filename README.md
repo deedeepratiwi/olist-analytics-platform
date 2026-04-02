@@ -122,6 +122,8 @@ The pipeline automates:
 - dbt runs 
 - dbt tests
 
+![Olist Kestra](images/kestra.png)
+
 ---
 
 ## 📊 Dashboard
